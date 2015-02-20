@@ -1,0 +1,15 @@
+body{
+	color: #ccc;
+	background-color: #000;
+}
+
+div{
+	width: 100%;
+	border: solid 1px black;
+	padding: 10px;
+	background-color: #222;
+}
+
+.output{
+	color: white;
+}
