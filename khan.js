@@ -1,6 +1,7 @@
 var docBody = document.getElementById("body");
 
 var meandiv = document.getElementById("meandiv");
+var sumoutput = document.getElementById("sumoutput");
 var orderedoutput = document.getElementById("orderedoutput");
 var totaloutput = document.getElementById("totaloutput");
 var meaninput = document.getElementById("meaninput");
@@ -12,6 +13,13 @@ var boxandwhiskeroutput = document.getElementById("boxandwhiskeroutput");
 
 
 var meanbutton = document.getElementById("meanbutton");
+var clearbutton = document.getElementById("clearbutton");
+clearbutton.addEventListener("click", function(){
+	
+	meaninput.value = " ";
+});
+
+
 meanbutton.addEventListener("click", function(){
 	
 	updateMiddles();
@@ -33,7 +41,9 @@ function updateMiddles(){
 	var median = medianfunction(numbers);
 	var mad = madfunction(mean, numbers);
 	var mode = threeValues.mode;
+	var sum = sumArray(numbers);
 
+	sumoutput.innerHTML = "" + sum;
 	orderedoutput.innerHTML = "" + numbers;
 	totaloutput.innerHTML = "" + numbers.length;
 	medianoutput.innerHTML = "" + median;
@@ -46,21 +56,21 @@ function updateMiddles(){
 
 }
 
+function sumArray(numbers){
+	var total = 0;
+	for(var i = 0; i < numbers.length; i++){
+		total += numbers[i];
+	}
+	return total;
+}
+
 function meanfunction(numbers){
 	
-	console.log(numbers);
+	
+	var total = sumArray(numbers);
+	
 
-	var sum = 0;
-	for(var i = 0; i < numbers.length; i++){
-		if( isNaN(numbers[i]) === true ){
-			console.log("FAIL");
-			meanoutput.innerHTML = "ERROR";
-			return;
-		}
-		sum += numbers[i];
-	}
-
-	var mean = sum / numbers.length;
+	var mean = total / numbers.length;
 
 	return mean;
 
@@ -100,13 +110,14 @@ function boxandwhiskerfunction(median, numbers, threeValues){
 		leftSide.push(numbers[i]);
 	}
 
-	for(var i = numbers.length - 1; i >= Math.floor(numbers.length / 2); i--){
+	for(var i = numbers.length - 1, count = Math.floor(numbers.length / 2); count > 0 ; i--, count--){
 		rightSide.push(numbers[i]);
 	}
 
-
 	console.log(leftSide);
 	console.log(rightSide);
+
+	rightSide = sortLowToHigh(rightSide);
 
 	var leftSideMedian = medianfunction(leftSide);
 	var rightSideMedian = medianfunction(rightSide);
@@ -233,7 +244,7 @@ function sortLowToHigh(numbers){
 
 		//insert thing to the right of innerIndex
 		tempArr.splice(innerIndex + 1, 0, thing);
-		console.log("temp arr");
+		
 		return tempArr;
 
 	}
