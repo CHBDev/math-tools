@@ -178,6 +178,7 @@ function getNumbersFromString(str){
 	var subString = "";
 	var currentIndex = 0;
 	var currentChar;
+	var nextNumNeg = 1;
 
 	while(currentIndex < str.length){
 		findNextNumber();
@@ -193,8 +194,18 @@ function getNumbersFromString(str){
 				return;
 			}
 
-			numbers.push(+subString);
+			var newNumber = +subString;
+			newNumber *= nextNumNeg;
+			nextNumNeg = 1;
+
+			numbers.push(newNumber);
 			subString = "";
+			return;
+		}
+
+		if(currentChar === "-"){
+
+			nextNumNeg = -1;
 			return;
 		}
 
@@ -207,11 +218,14 @@ function getNumbersFromString(str){
 		subString = "" + subString + currentChar;
  		
 		if(currentIndex === str.length){
-			numbers.push(+subString);
+			var newNumber = +subString;
+			newNumber *= nextNumNeg;
+			nextNumNeg = 1;
+			numbers.push(newNumber);
 		}
 	}
 
-
+console.log(numbers);
 
 	return numbers;
 }
@@ -418,8 +432,14 @@ function getVolumeOftriprism(LWH){
 
 //FRACTIONS
 
-var fractioninput = document.getElementById("fractioninput");
+var fractioninput1 = document.getElementById("fractioninput1");
+var fractioninput2 = document.getElementById("fractioninput2");
+var fractioninput3 = document.getElementById("fractioninput3");
+var fractioninput4 = document.getElementById("fractioninput4");
 var fractionaddoutput = document.getElementById("fractionaddoutput");
+var fractionsubtractoutput = document.getElementById("fractionsubtractoutput");
+var fractionmultiplyoutput = document.getElementById("fractionmultiplyoutput");
+var fractiondivideoutput = document.getElementById("fractiondivideoutput");
 var fractionclearbutton = document.getElementById("fractionclearbutton");
 var fractionbutton = document.getElementById("fractionbutton");
 fractionbutton.addEventListener("click", function(){
@@ -430,7 +450,10 @@ fractionbutton.addEventListener("click", function(){
 
 fractionclearbutton.addEventListener("click", function(){
 	
-	fractionsurfaceoutput.value = " ";
+	fractioninput1.value = " ";
+	fractioninput2.value = " ";
+	fractioninput3.value = " ";
+	fractioninput4.value = " ";
 	
 });
 
@@ -442,23 +465,29 @@ function updatefractions(){
 	var frac4 = getNumbersFromString(fractioninput4.value);
 	
 	var fractionadd = getFractionAdd(frac1,frac2,frac3,frac4);
-	console.log(fractionadd);
+	var fractionsubtract = getFractionSubtract(frac1,frac2,frac3,frac4);
+	var fractionmultiply = getFractionMultiply(frac1,frac2,frac3,frac4);
+	var fractiondivide = getFractionDivide(frac1,frac2,frac3,frac4);
+	
 	//var fractionsubtract = getFractionSubtract(frac1,frac2,frac3,frac4);
 	//var fractionmultiply = getFractionMultiply(frac1,frac2,frac3,frac4);
 	//var fractiondivide = getFractionDivide(frac1,frac2,frac3,frac4);
 	
 
 	fractionaddoutput.innerHTML = "" + fractionadd[0] + "/" + fractionadd[1];
+	fractionsubtractoutput.innerHTML = "" + fractionsubtract[0] + "/" + fractionsubtract[1];
+	fractionmultiplyoutput.innerHTML = "" + fractionmultiply[0] + "/" + fractionmultiply[1];
+	fractiondivideoutput.innerHTML = "" + fractiondivide[0] + "/" + fractiondivide[1];
 	
 }
 
 function getFractionAdd(frac1, frac2, frac3, frac4){
 
-	var divisor1 = findLargestDivisors([frac1, frac2]);
+	var divisor1 = greatestCommonFactor([frac1, frac2]);
 	frac1 /= divisor1;
 	frac2 /= divisor1;
 
-	var divisor2 = findLargestDivisors([frac3, frac4]);
+	var divisor2 = greatestCommonFactor([frac3, frac4]);
 	frac3 /= divisor2;
 	frac4 /= divisor2;
 
@@ -476,7 +505,7 @@ function getFractionAdd(frac1, frac2, frac3, frac4){
 	var top = frac1 + frac3;
 	var bottom = frac2;
 
-	var finalDivisor = findLargestDivisors([top, bottom]);
+	var finalDivisor = greatestCommonFactor([top, bottom]);
 	console.log("final divisor " + finalDivisor);
 	top /= finalDivisor;
 	bottom /= finalDivisor;
@@ -485,6 +514,71 @@ function getFractionAdd(frac1, frac2, frac3, frac4){
 
 
 
+}
+
+function getFractionSubtract(frac1, frac2, frac3, frac4){
+
+	var divisor1 = greatestCommonFactor([frac1, frac2]);
+	frac1 /= divisor1;
+	frac2 /= divisor1;
+
+	var divisor2 = greatestCommonFactor([frac3, frac4]);
+	frac3 /= divisor2;
+	frac4 /= divisor2;
+
+	var LCD = getLowestCommonDenomenator([frac2, frac4]);
+
+	var leftMult = LCD/frac2;
+	var rightMult = LCD/frac4;
+
+
+	frac1 *= leftMult;
+	frac2 = LCD;
+	frac3 *= rightMult;
+	frac4 = LCD;
+
+	var top = frac1 - frac3;
+	var bottom = frac2;
+
+	var finalDivisor = greatestCommonFactor([top, bottom]);
+	console.log("final divisor " + finalDivisor);
+	top /= finalDivisor;
+	bottom /= finalDivisor;
+
+	return [top,bottom];
+
+
+
+}
+
+function getFractionMultiply(frac1, frac2, frac3, frac4){
+	
+
+	var top = frac1 * frac3;
+	var bottom = frac2 * frac4;
+
+	var finalDivisor = greatestCommonFactor([top, bottom]);
+	top /= finalDivisor;
+	bottom /= finalDivisor;
+
+	return [top,bottom];
+}
+
+function getFractionDivide(frac1, frac2, frac3, frac4){
+	
+	if(frac3 < 0){
+		frac3 *= -1;
+		frac4 *= -1;
+	}
+
+	var top = frac1 * frac4;
+	var bottom = frac2 * frac3;
+
+	var finalDivisor = greatestCommonFactor([top, bottom]);
+	top /= finalDivisor;
+	bottom /= finalDivisor;
+
+	return [top,bottom];
 }
 
 function getLowestCommonMultiple(list){
@@ -541,7 +635,7 @@ function getLowestCommonDenomenator(numbers){
 
 }
 
-	function findLargestDivisors(numbers){
+	function greatestCommonFactor(numbers){
 		var bigList = [];
 		for(var i = 0; i < numbers.length; i++){
 			bigList.push(getMultiples(numbers[i], true));
@@ -597,6 +691,101 @@ function getLowestCommonDenomenator(numbers){
 		return numList;
 	}
 
+	function isPrime(num){
+		if(num % 1 !== 0){
+			return false;
+		}
+
+		if(num < 2){
+			return false;
+		}
+
+		var numList = getMultiples(num, true);
+		if(numList.length > 2){
+			return false;
+		}
+
+		return true;
+	}
+
+	function primeFactorization(num){
+
+		if(isPrime(num)){
+			return [num];
+		}
+		num = +num;
+
+		num = Math.floor(num);
+
+		var numList = getMultiples(num);
+		var primeMultiples = [];
+		var factorization = [];
+		for(var i = 0; i < numList.length; i++){
+			if(isPrime(numList[i]) === true ){
+				primeMultiples.push([numList[i],1, 0]);
+			}
+		}
+
+
+		//var highestPrime = primeMultiples[primeMultiples.length - 1];
+		//highestPrime[2] = 1;
+		//highestPrime[1] = highestPrime[0]; 
+
+
+		function mainLoop(index, arr){
+			var total = 1;
+			for(var i = 0; i<arr.length; i++){
+				total *=   arr[i][1];
+			}
+
+			if(total === num){
+				for(var j = 0; j<arr.length; j++){
+					if(arr[j][2] > 0){
+						for(var k = 0; k < arr[j][2]; k++){
+							factorization.push(arr[j][0]);
+						}
+						
+					}
+				}
+				return factorization;
+			}
+
+			if(total > num){
+				arr[index][1] = 1;
+				arr[index][2] = 0;
+
+				arr[index - 1][2] += 1;
+				arr[index - 1][1] *= arr[index - 1][0];
+				index = arr.length - 1;
+			}
+
+			if(total < num){
+				arr[index][2] += 1;
+				arr[index][1] *= arr[index][0];
+			}
+
+			return mainLoop(index, arr);
+
+		}
+
+
+		return mainLoop(primeMultiples.length - 1, primeMultiples);
+
+	}
+
+	console.log("PF ", primeFactorization(6784693));
+
+//divisible
+//2 if last number is divisible by 2
+//3 if sum of digits is divisible by 3, so on and so on
+//4 if last 2 digits divisible by 4
+//5 if 5 or 0
+//6 if both 2 and 3
+//9 if sum of digits divisible by 9
+//10 last digit is 0
+
+//prime factorization
+//any number is made up of prime multiplied in one way only
 
 
 
